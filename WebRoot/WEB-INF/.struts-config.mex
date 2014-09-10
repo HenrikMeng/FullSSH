@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowViewLayout Version="1.2">
+  <StrutsActivity path="/loginStruts1.do" location="50,50" dimension="262,84" />
+  <StrutsActivity path="error;6" location="650,50" dimension="136,72" />
+  <StrutsActivity path="/struts1/loginStruts1.jsp" location="50,250" dimension="190,48" />
+  <StrutsActivity path="/struts1/main.jsp" location="350,250" dimension="142,48" />
+  <StrutsActivity path="/struts1/error.jsp" location="650,250" dimension="148,48" />
+  <StrutsActivity path="/form/loginStruts1.jsp" location="420,60" dimension="172,48" />
+  <StrutsActivity path="/form/main.jsp" location="950,150" dimension="124,48" />
+  <StrutsActivity path="/form/error.jsp" location="950,50" dimension="130,48" />
+  <StrutsActivity path="/springStruts1Action.do" location="950,250" dimension="304,84" />
+  <StrutsTransition id="/loginStruts1.do,success,/struts1/main.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="312,92" />
+      <AbsolutePoint location="405,92" />
+      <AbsolutePoint location="405,250" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/springStruts1Action.do,success,/struts1/main.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="950,313" />
+      <AbsolutePoint location="421,313" />
+      <AbsolutePoint location="421,298" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/springStruts1Action.do,faile,/struts1/loginStruts1.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1102,334" />
+      <AbsolutePoint location="1102,409" />
+      <AbsolutePoint location="145,409" />
+      <AbsolutePoint location="145,298" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/loginStruts1.do,faile,/struts1/loginStruts1.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="145,134" />
+      <AbsolutePoint location="145,250" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/struts1/loginStruts1.jsp,null,/loginStruts1.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="181,250" />
+      <AbsolutePoint location="181,134" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/struts1/loginStruts1.jsp,null,/springStruts1Action.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="211,250" />
+      <AbsolutePoint location="211,213" />
+      <AbsolutePoint location="1102,213" />
+      <AbsolutePoint location="1102,250" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="error;6,null,/struts1/error.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="718,86" />
+      <AbsolutePoint location="0,0" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+</FlowViewLayout>
+

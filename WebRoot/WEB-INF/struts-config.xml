@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd">
+<struts-config>
+	<data-sources />
+	<form-beans>
+		<form-bean name="loginStruts1Form"
+			type="com.struts.form.LoginStruts1Form" />
+	</form-beans>
+	<global-exceptions />
+	<global-forwards>
+		<forward name="error" path="/struts1/error.jsp" />
+	</global-forwards>
+	<action-mappings>
+		<action attribute="loginStruts1Form"
+			input="/struts1/loginStruts1.jsp" name="loginStruts1Form"
+			path="/loginStruts1" scope="request"
+			type="com.struts.action.LoginStruts1Action">
+			<forward name="success" path="/struts1/main.jsp" />
+			<forward name="faile" path="/struts1/loginStruts1.jsp" />
+		</action>
+		<action path="/springStruts1Action"
+			type="com.struts.action.SpringStruts1ActionAction"
+			input="/struts1/loginStruts1.jsp" name="loginStruts1Form">
+			<forward name="faile" path="/struts1/loginStruts1.jsp" />
+			<forward name="success" path="/struts1/main.jsp" />
+		</action>
+	</action-mappings>
+	<!-- 
+	 让spring管理struts的action，有三种方式,建议采用第一种方式
+     1) 最简单的一种，改变其请求处理器：
+        <controller processorClass="org.springframework.web.struts.DelegatingRequestProcessor"/>
+     2) 在struts的action中直接继承spring的一个ActionSupport
+     3) 改action的配置中的type，换成spring的一个代理，这个每个action都要改，
+     比较麻烦,<type="org.springframework.web.struts.DelegatingActionProxy" >
+	 -->
+	<controller
+		processorClass="org.springframework.web.struts.DelegatingRequestProcessor">
+	</controller>
+	<message-resources parameter="com.struts.ApplicationResources" />
+	
+	<!--  在struts中引入spring需要在struts-config.xml中注册，引入spring的插件，
+	但其相关代码必须写在message-resources标签后：
+	<plug-in className="org.springframework.web.struts.ContextLoaderPlugIn">
+  	   <set-property property="contextConfigLocation" 
+  	                 value="/WEB-INF/classes/applicationContext.xml"/>
+	</plug-in>
+	//这种方式我试过不好使用，有待进一步发现和研究
+	-->
+</struts-config>
+

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<!-- 数据源 -->
+	<bean id="ds" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName"
+			value="com.mysql.jdbc.Driver">
+		</property>
+		<property name="url"
+			value="jdbc:mysql://localhost:3306/accp?characterEncoding=GBK">
+		</property>
+		<property name="username" value="root"></property>
+	</bean>
+
+	<!-- session的创建工厂 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="ds" />
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.connection.autocommit">true</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>com/hibernate/pojo/User.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- userDao 的测试版本：包括HibernateTemplate的Set注入，构造方法注入，直接继承 -->
+	<bean id="userDao1" class="com.hibernate.dao.UserDao1">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="userDao2" class="com.hibernate.dao.UserDao2">
+		<constructor-arg index="0">
+			<ref bean="htmp" />
+		</constructor-arg>
+	</bean>
+	<!--配置HibernateTemplate模板: 一般属于Set注入或构造方法注入形式时才 ref "htmp"-->
+	<bean name="htmp"
+		class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="userDao3" class="com.hibernate.dao.UserDao3">
+		<property name="htmp" ref="htmp"></property>
+	</bean>
+	<bean id="userDao4" class="com.hibernate.dao.UserDao4">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="transactionManager" ref="transactionManager"></property>
+	</bean>
+	<!-- end  HibernateTemplate 测试 -->
+
+	<!--配置数据访问层 Dao -->
+	<bean id="userDao" class="com.hibernate.dao.UserDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="personDao" class="com.hibernate.dao.PersonDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="sonDao" class="com.hibernate.dao.SonDao">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<!-- 配置业务代理层 Delegate 谨记：此处的bean标签的 id 属性 不能用Name代替-->
+	<bean id="userDelegate" class="com.spring.delegate.UserDelegate">
+		<property name="iuserdao" ref="userDao"></property>
+	</bean>
+	<bean id="personDelegate"
+		class="com.spring.delegate.PersonDelegate">
+		<property name="ipersondao" ref="personDao"></property>
+	</bean>
+	<bean id="sonDelegate" class="com.spring.delegate.SonDelegate">
+		<property name="isondao" ref="sonDao"></property>
+	</bean>
+
+
+	<!--配置事务管理器-->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+
+	<!--配置代理对象,提取事务作为切面，即服务代码 -->
+	<bean id="baseTransactionProxy"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		abstract="true">
+		<!--指定切面对象(代理对象)：事务 transactionManager-即事务管理器 -->
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<!--指定需要代理的方法 -->
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 指定业务对象，统一使用 baseTransactionProxy（事务代理）作为其代理-->
+	<bean id="userDelegateProxy" parent="baseTransactionProxy">
+		<property name="target" ref="userDelegate"></property>
+	</bean>
+	<bean id="personDelegateProxy" parent="baseTransactionProxy">
+		<property name="target" ref="sonDelegate"></property>
+	</bean>
+	<bean id="sonDelegateProxy" parent="baseTransactionProxy">
+		<property name="target" ref="sonDelegate"></property>
+	</bean>
+
+
+	<!-- spring管理Strut1的方式 -->
+	<bean name="/springStruts1Action"
+		class="com.struts.action.SpringStruts1ActionAction">
+		<property name="ud" ref="userDelegate"></property>
+	</bean>
+
+
+	<!-- spring管理Strut2的方式 -->
+	<bean id="loginSpringStruts2Action"
+		class="com.struts2.LoginSpringStruts2Action">
+		<!-- 此处的 loginStruts2Action 被当作伪Action -->
+		<property name="ud" ref="userDelegate"></property>
+	</bean>
+</beans>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.i18n.encoding" value="GBK" />
+	<!-- <constant name="struts.objectFactory.spring.aotowire" value="auto" /> -->
+	<!-- 改变Spring自动装配策略：name 表示根据属性名，type 表示根据属性类型,
+		auto表示自动检测,constructor 表示使用构造器注入，而不是Set设置注入，其与type类似 -->
+	<package name="struts2" extends="struts-default"
+		namespace="/struts2">
+		<global-results>
+			<result name="error">/struts2/error.jsp</result>
+		</global-results>
+		<action name="login2Action"
+			class="com.struts2.LoginStruts2Action">
+			<result name="error">loginStruts2.jsp</result>
+			<result name="success">main.jsp</result>
+		</action>
+
+		<!--
+			此处的 loginSpringStruts2Action 是Spring配置文件中的Bean（其中关联了Delegate业务代理），
+			即这种说法叫“struts2的伪Action”
+			Struts2的Action交给spring来创建管理时，其实它是由strust框架根据filter来发现:
+			<filter>
+			<filter-name>struts2</filter-name>
+			<filter-class>org.apache.struts2.dispatcher.FilterDispatcher</filter-class>
+			</filter>  和
+			<listener>
+			<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+			</listener>
+			// 此处存在错误，有待进一步解决
+			
+		思考：哎，刚才终于解决了这个问题，原来要让Spring管理struts2，即struts2支持伪Action 的话
+		必须导入一个Jar包：struts2-spring-plugin-2.0.11.jar
+		-->
+		<action name="loginSpringAction"
+			class="loginSpringStruts2Action">
+			<result name="error">loginStruts2.jsp</result>
+			<result name="success">main.jsp</result>
+		</action>
+	</package>
+</struts>

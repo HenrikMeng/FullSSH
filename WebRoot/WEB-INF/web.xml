@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.4"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee   http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<!-- 
+		自动关闭连接会造成延迟加载初始化异常，此时可用OpenSessionInView模式解决。
+		Spring提供Open Session In View来解决这个问题.但是连接一直不关，易引起
+		连接池溢出。这里只在Struts1上做过测试，struts2中，不知是否需要一下工作代码。
+	-->
+	<filter>
+		<filter-name>hibernateFilter</filter-name>
+		<filter-class>
+			org.springframework.orm.hibernate3.support.OpenSessionInViewFilter
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>hibernateFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+	<!-- 
+	ContextLoaderServlet 形式也行，但是ContextLoaderListener 监听器肯定
+	比ContextLoaderServlet先加载，效率更高。
+		<context-param> 
+		<param-name>contextConfigLocation</param-name> 
+		<param-value>/WEB-INF/applicationContext.xml</param-value> 
+		</context-param>
+		<servlet>
+		<servlet-name>context</servlet-name>
+		<servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+		</servlet>
+	此举负责加载Spring的框架和配置文件
+	-->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			/WEB-INF/classes/applicationContext.xml
+		</param-value>
+	</context-param>
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener>
+	
+	<!-- 以下是Struts1 的加载服务代码，形式以：*.do提交方式	 -->
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>
+			org.apache.struts.action.ActionServlet
+		</servlet-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/struts-config.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>3</param-value>
+		</init-param>
+		<init-param>
+			<param-name>detail</param-name>
+			<param-value>3</param-value>
+		</init-param>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 以下是Struts2 的加载服务代码，形式以：*.action提交方式 -->
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>
+			org.apache.struts2.dispatcher.FilterDispatcher
+		</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- 主页面加载  /struts1/loginStruts1.jsp,/struts1/springStruts1.jsp,
+	/struts2/loginStruts2.jsp,/struts2/loginSpringStruts2.jsp-->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
+
